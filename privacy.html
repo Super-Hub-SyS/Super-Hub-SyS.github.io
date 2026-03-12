@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Hub — Privacy Policy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #04070f;
+      --border:    rgba(0,200,255,0.15);
+      --accent:    #00c8ff;
+      --accent2:   #7b2fff;
+      --text:      #e8f4ff;
+      --muted:     #5a7a99;
+      --card:      rgba(8,14,28,0.85);
+      --glow:      0 0 24px rgba(0,200,255,0.35);
+      --transition: 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    [data-theme="light"] {
+      --bg:      #f0f6ff;
+      --border:  rgba(0,120,200,0.18);
+      --accent:  #006bcc;
+      --accent2: #6b00e0;
+      --text:    #0a1628;
+      --muted:   #5577aa;
+      --card:    rgba(255,255,255,0.9);
+      --glow:    0 0 24px rgba(0,107,204,0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg); color: var(--text);
+      overflow-x: hidden;
+      transition: background var(--transition), color var(--transition);
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 5vw;
+      backdrop-filter: blur(16px);
+      background: rgba(4,7,15,0.6);
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    [data-theme="light"] nav { background: rgba(240,246,255,0.7); }
+    .nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900; font-size: 1.1rem; letter-spacing: 0.12em;
+      color: var(--accent); text-shadow: var(--glow);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--text); }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .nav-back {
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); transition: color var(--transition); text-decoration: none;
+    }
+    .nav-back:hover { color: var(--accent); text-decoration: none; }
+    .lang-btn {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); padding: 0.3rem 0.7rem;
+      border-radius: 4px; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .toggle-btn {
+      width: 42px; height: 22px;
+      background: var(--border); border: 1px solid var(--accent);
+      border-radius: 99px; cursor: pointer; position: relative;
+      transition: background var(--transition); flex-shrink: 0;
+    }
+    .toggle-btn::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent); box-shadow: var(--glow);
+      transition: transform var(--transition);
+    }
+    [data-theme="light"] .toggle-btn::after { transform: translateX(20px); }
+
+    main {
+      position: relative; z-index: 1;
+      max-width: 760px; margin: 0 auto;
+      padding: 8rem 5vw 6rem;
+    }
+    .page-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.6rem;
+    }
+    h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.6rem, 4vw, 2.5rem);
+      font-weight: 900; line-height: 1.1; margin-bottom: 0.5rem;
+    }
+    .updated { font-size: 0.8rem; color: var(--muted); margin-bottom: 2.5rem; letter-spacing: 0.05em; }
+    .divider {
+      width: 60px; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      margin: 1.5rem 0 3rem; border-radius: 99px;
+    }
+
+    .policy-section {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 2rem; margin-bottom: 1.25rem;
+      backdrop-filter: blur(12px);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      position: relative; overflow: hidden;
+    }
+    .policy-section::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0; transition: opacity var(--transition);
+    }
+    .policy-section:hover { border-color: var(--accent); box-shadow: var(--glow); }
+    .policy-section:hover::before { opacity: 1; }
+    .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .section-icon { font-size: 1.2rem; }
+    h2 { font-family: 'Orbitron', monospace; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.05em; }
+    p { font-size: 0.95rem; color: var(--muted); line-height: 1.8; }
+    code { color: var(--accent); font-size: .9em; }
+
+    .no-data-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1rem;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.4rem 1rem; border-radius: 99px;
+      background: rgba(0,200,255,0.08); color: var(--accent);
+      border: 1px solid rgba(0,200,255,0.25);
+    }
+    .no-data-badge::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); box-shadow: var(--glow);
+    }
+
+    footer {
+      position: relative; z-index: 1;
+      text-align: center; padding: 2.5rem 5vw;
+      border-top: 1px solid var(--border);
+      color: var(--muted); font-size: 0.8rem;
+    }
+    footer span { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">SUPER<span>HUB</span></a>
+    <div class="nav-right">
+      <a href="index.html" class="nav-back" data-i18n="nav.back"></a>
+      <button class="lang-btn" id="langToggle">EN</button>
+      <button class="toggle-btn" id="themeToggle" aria-label="Toggle theme"></button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-label" data-i18n="page.label"></div>
+    <h1 data-i18n="page.title"></h1>
+    <p class="updated" data-i18n="page.updated"></p>
+    <div class="divider"></div>
+
+    <div class="policy-section">
+      <div class="section-header">
+        <span class="section-icon">🔍</span>
+        <h2 data-i18n="s1.title"></h2>
+      </div>
+      <p data-i18n="s1.text"></p>
+      <div class="no-data-badge" data-i18n="s1.badge"></div>
+    </div>
+
+    <div class="policy-section">
+      <div class="section-header">
+        <span class="section-icon">💾</span>
+        <h2 data-i18n="s2.title"></h2>
+      </div>
+      <p data-i18n="s2.text"></p>
+    </div>
+
+    <div class="policy-section">
+      <div class="section-header">
+        <span class="section-icon">🌐</span>
+        <h2 data-i18n="s3.title"></h2>
+      </div>
+      <p data-i18n="s3.text"></p>
+    </div>
+
+    <div class="policy-section">
+      <div class="section-header">
+        <span class="section-icon">🔗</span>
+        <h2 data-i18n="s4.title"></h2>
+      </div>
+      <p data-i18n="s4.text"></p>
+    </div>
+  </main>
+
+  <footer>
+    <p data-i18n="footer.copy"></p>
+  </footer>
+
+  <script>
+    const i18n = {
+      pt: {
+        "nav.back":      "← Voltar",
+        "page.label":    "// legal",
+        "page.title":    "Política de Privacidade",
+        "page.updated":  "Última atualização: 11 de março de 2026",
+        "s1.title":      "Coleta de Dados",
+        "s1.text":       "O Super Hub não coleta, transmite ou armazena nenhum dado pessoal do usuário.",
+        "s1.badge":      "Zero coleta de dados",
+        "s2.title":      "Armazenamento Local",
+        "s2.text":       "Todas as configurações — lista de IAs, tema e tamanho de fonte — são armazenadas exclusivamente no armazenamento local do navegador (<code>chrome.storage.local</code>) e nunca saem do dispositivo do usuário.",
+        "s3.title":      "Serviços Externos",
+        "s3.text":       "A extensão não utiliza servidores externos, analytics, rastreamento, cookies ou qualquer forma de telemetria.",
+        "s4.title":      "Sites de Terceiros",
+        "s4.text":       "O painel lateral exibe sites de terceiros (ChatGPT, Claude, Gemini etc.) dentro do navegador do usuário. O desenvolvedor da extensão não tem acesso ao conteúdo ou às interações realizadas nesses sites.",
+        "footer.copy":   "© 2025 <span>Super Hub</span> — Todos os direitos reservados · SuperHub-SyS",
+      },
+      en: {
+        "nav.back":      "← Back",
+        "page.label":    "// legal",
+        "page.title":    "Privacy Policy",
+        "page.updated":  "Last updated: March 11, 2026",
+        "s1.title":      "Data Collection",
+        "s1.text":       "Super Hub does not collect, transmit, or store any personal user data.",
+        "s1.badge":      "Zero data collection",
+        "s2.title":      "Local Storage",
+        "s2.text":       "All settings — AI list, theme, and font size — are stored exclusively in the browser's local storage (<code>chrome.storage.local</code>) and never leave the user's device.",
+        "s3.title":      "External Services",
+        "s3.text":       "The extension does not use external servers, analytics, tracking, cookies, or any form of telemetry.",
+        "s4.title":      "Third-Party Sites",
+        "s4.text":       "The side panel displays third-party websites (ChatGPT, Claude, Gemini, etc.) inside the user's browser. The extension developer has no access to the content or interactions performed on those sites.",
+        "footer.copy":   "© 2025 <span>Super Hub</span> — All rights reserved · SuperHub-SyS",
+      }
+    };
+
+    const browserLang = (navigator.language || 'en').toLowerCase();
+    const defaultLang  = browserLang.startsWith('pt') ? 'pt' : 'en';
+    let currentLang    = localStorage.getItem('lang') || defaultLang;
+
+    function applyTranslations(lang) {
+      const t = i18n[lang];
+      document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) el.innerHTML = t[key];
+      });
+      document.getElementById('langToggle').textContent = lang === 'pt' ? 'EN' : 'PT';
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+    }
+
+    const html  = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if (saved) html.setAttribute('data-theme', saved);
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+
+    document.getElementById('langToggle').addEventListener('click', () => {
+      applyTranslations(currentLang === 'pt' ? 'en' : 'pt');
+    });
+
+    applyTranslations(currentLang);
+  </script>
+</body>
+</html>
