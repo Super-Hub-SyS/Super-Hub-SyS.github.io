@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Hub — Chrome Extensions</title>
+  <meta name="description" content="Acesse ChatGPT, Claude, Gemini e outras IAs em um painel lateral sem sair da sua página atual." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #04070f;
+      --surface:   #080e1c;
+      --border:    rgba(0,200,255,0.15);
+      --accent:    #00c8ff;
+      --accent2:   #7b2fff;
+      --text:      #e8f4ff;
+      --muted:     #5a7a99;
+      --card:      rgba(8,14,28,0.85);
+      --glow:      0 0 24px rgba(0,200,255,0.35);
+      --transition: 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    [data-theme="light"] {
+      --bg:      #f0f6ff;
+      --surface: #ffffff;
+      --border:  rgba(0,120,200,0.18);
+      --accent:  #006bcc;
+      --accent2: #6b00e0;
+      --text:    #0a1628;
+      --muted:   #5577aa;
+      --card:    rgba(255,255,255,0.9);
+      --glow:    0 0 24px rgba(0,107,204,0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      transition: background var(--transition), color var(--transition);
+    }
+    a { color: inherit; text-decoration: none; }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      transition: background var(--transition);
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 5vw;
+      backdrop-filter: blur(16px);
+      background: rgba(4,7,15,0.6);
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition), border-color var(--transition);
+    }
+    [data-theme="light"] nav { background: rgba(240,246,255,0.7); }
+    .nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900; font-size: 1.1rem; letter-spacing: 0.12em;
+      color: var(--accent); text-shadow: var(--glow);
+    }
+    .nav-logo span { color: var(--text); }
+    nav ul { display: flex; gap: 2.5rem; list-style: none; }
+    nav ul a {
+      font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); transition: color var(--transition);
+    }
+    nav ul a:hover { color: var(--accent); }
+    .nav-controls { display: flex; align-items: center; gap: 1rem; }
+    .lang-btn {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.3rem 0.7rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .toggle-btn {
+      width: 42px; height: 22px;
+      background: var(--border);
+      border: 1px solid var(--accent);
+      border-radius: 99px;
+      cursor: pointer; position: relative;
+      transition: background var(--transition);
+      flex-shrink: 0;
+    }
+    .toggle-btn::after {
+      content: '';
+      position: absolute; top: 3px; left: 3px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent); box-shadow: var(--glow);
+      transition: transform var(--transition);
+    }
+    [data-theme="light"] .toggle-btn::after { transform: translateX(20px); }
+
+    /* HERO */
+    #hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 0 5vw;
+      overflow: hidden;
+    }
+    .hero-orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+    .orb1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0,200,255,0.18) 0%, transparent 70%);
+      top: -100px; left: -100px;
+      animation: drift1 10s ease-in-out infinite alternate;
+    }
+    .orb2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(123,47,255,0.15) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+      animation: drift2 12s ease-in-out infinite alternate;
+    }
+    @keyframes drift1 { to { transform: translate(40px,60px); } }
+    @keyframes drift2 { to { transform: translate(-40px,-50px); } }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); border: 1px solid var(--accent);
+      padding: 0.4rem 1rem; border-radius: 99px; margin-bottom: 2rem;
+      opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+    }
+    .hero-badge::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); box-shadow: var(--glow);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.4)} }
+
+    h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 900; line-height: 0.95; letter-spacing: -0.02em;
+      opacity: 0; animation: fadeUp 0.9s 0.4s forwards;
+    }
+    h1 .accent  { color: var(--accent);  text-shadow: var(--glow); }
+    h1 .accent2 { color: var(--accent2); }
+
+    .hero-sub {
+      max-width: 580px;
+      font-size: 1.05rem; font-weight: 300; color: var(--muted); line-height: 1.7;
+      margin: 1.5rem auto 2.5rem;
+      opacity: 0; animation: fadeUp 0.9s 0.6s forwards;
+    }
+    .hero-cta {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.9s 0.8s forwards;
+    }
+    .btn {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.9rem 2.2rem; border-radius: 4px;
+      cursor: pointer; border: none;
+      transition: all var(--transition); position: relative; overflow: hidden;
+    }
+    .btn-primary { background: var(--accent); color: #04070f; }
+    .btn-primary::after { content:''; position:absolute; inset:0; background:white; opacity:0; transition:opacity var(--transition); }
+    .btn-primary:hover::after { opacity: 0.15; }
+    .btn-primary:hover { box-shadow: var(--glow), 0 8px 32px rgba(0,200,255,0.3); transform: translateY(-2px); }
+    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* SECTIONS */
+    section { position: relative; z-index: 1; padding: 7rem 5vw; }
+    .section-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.6rem;
+    }
+    h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 900; line-height: 1.1; margin-bottom: 1rem;
+    }
+    .section-divider {
+      width: 60px; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      margin: 1.5rem 0 3rem; border-radius: 99px;
+    }
+
+    /* MAIN EXT CARD */
+    #extensions { max-width: 1100px; margin: 0 auto; }
+    .ext-main-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3rem;
+      backdrop-filter: blur(12px);
+      position: relative; overflow: hidden;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      margin-bottom: 4rem;
+    }
+    .ext-main-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .ext-main-card:hover { border-color: var(--accent); box-shadow: var(--glow); }
+    .ext-header {
+      display: flex; align-items: flex-start; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap;
+    }
+    .ext-icon-lg {
+      width: 72px; height: 72px; flex-shrink: 0;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; box-shadow: var(--glow);
+    }
+    .ext-header-text { flex: 1; }
+    .ext-name-lg {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.6rem; font-weight: 900; margin-bottom: 0.4rem;
+    }
+    .ext-tagline { font-size: 0.95rem; color: var(--muted); line-height: 1.6; }
+    .ext-status {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.3rem 0.8rem; border-radius: 99px; align-self: flex-start;
+    }
+    .status-soon {
+      background: rgba(123,47,255,0.15); color: var(--accent2);
+      border: 1px solid rgba(123,47,255,0.3);
+    }
+    .status-soon::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; animation: pulse 1.5s infinite; }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem;
+    }
+    .feature-item {
+      display: flex; align-items: flex-start; gap: 0.8rem;
+      padding: 1rem 1.25rem;
+      background: rgba(0,200,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .feature-item:hover { border-color: var(--accent); background: rgba(0,200,255,0.08); }
+    .feature-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .feature-text { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+    .feature-text strong { color: var(--text); display: block; margin-bottom: 0.15rem; font-weight: 600; }
+
+    .ias-row {
+      display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; align-items: center;
+    }
+    .ia-badge {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+      padding: 0.35rem 0.85rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: all var(--transition);
+    }
+    .ia-badge:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* FUTURE CARDS */
+    .ext-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+    .ext-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+      padding: 2rem; position: relative; overflow: hidden;
+      backdrop-filter: blur(12px);
+      transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+    .ext-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0; transition: opacity var(--transition);
+    }
+    .ext-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: var(--glow); }
+    .ext-card:hover::before { opacity: 1; }
+    .ext-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1.25rem; }
+    .ext-name { font-family: 'Orbitron', monospace; font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--muted); }
+    .ext-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; }
+
+    /* ABOUT */
+    #about {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+    }
+    .about-visual { position: relative; display: flex; align-items: center; justify-content: center; }
+    .about-hex {
+      width: 240px; height: 240px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem; box-shadow: var(--glow);
+      animation: hexspin 8s linear infinite;
+    }
+    @keyframes hexspin { 0%,100%{filter:hue-rotate(0deg)} 50%{filter:hue-rotate(30deg)} }
+    .about-ring {
+      position: absolute; border-radius: 50%; border: 1px solid var(--accent);
+      animation: ringpulse 3s ease-in-out infinite;
+    }
+    .about-ring:nth-child(1) { width: 290px; height: 290px; opacity: 0.3; }
+    .about-ring:nth-child(2) { width: 340px; height: 340px; opacity: 0.15; animation-delay: 1s; }
+    @keyframes ringpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+    .about-text p { font-size: 1rem; color: var(--muted); line-height: 1.8; margin-bottom: 1rem; }
+    .about-tags { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.5rem; }
+    .tag {
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.4rem 0.9rem; border: 1px solid var(--border); border-radius: 4px;
+      color: var(--muted); transition: all var(--transition);
+    }
+    .tag:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* FOOTER */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center; padding: 3rem 5vw;
+      border-top: 1px solid var(--border);
+      color: var(--muted); font-size: 0.8rem; letter-spacing: 0.05em;
+    }
+    footer span { color: var(--accent); }
+
+    @media (max-width: 768px) {
+      nav ul { display: none; }
+      #about { grid-template-columns: 1fr; text-align: center; gap: 3rem; }
+      .about-visual { order: -1; }
+      .about-tags { justify-content: center; }
+      .ext-main-card { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">SUPER<span>HUB</span></div>
+    <ul>
+      <li><a href="#extensions" data-i18n="nav.extensions"></a></li>
+      <li><a href="#about" data-i18n="nav.about"></a></li>
+    </ul>
+    <div class="nav-controls">
+      <button class="lang-btn" id="langToggle">EN</button>
+      <button class="toggle-btn" id="themeToggle" aria-label="Toggle theme"></button>
+    </div>
+  </nav>
+
+  <section id="hero">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-badge" data-i18n="hero.badge"></div>
+    <h1><span class="accent">SUPER</span><br><span class="accent2">HUB</span></h1>
+    <p class="hero-sub" data-i18n="hero.sub"></p>
+    <div class="hero-cta">
+      <a href="#extensions" class="btn btn-primary" data-i18n="hero.cta1"></a>
+      <a href="#about" class="btn btn-ghost" data-i18n="hero.cta2"></a>
+    </div>
+  </section>
+
+  <section>
+    <div id="extensions">
+      <div class="section-label" data-i18n="ext.label"></div>
+      <h2 data-i18n="ext.title"></h2>
+      <div class="section-divider"></div>
+
+      <div class="ext-main-card">
+        <div class="ext-header">
+          <div class="ext-icon-lg">⚡</div>
+          <div class="ext-header-text">
+            <div class="ext-name-lg">Super Hub</div>
+            <p class="ext-tagline" data-i18n="ext.tagline"></p>
+          </div>
+          <span class="ext-status status-soon" data-i18n="ext.status"></span>
+        </div>
+        <div class="features-grid" id="featuresGrid"></div>
+        <div class="ias-row" id="iasRow"></div>
+      </div>
+
+      <div class="ext-grid">
+        <div class="ext-card" style="opacity:.45;border-style:dashed;">
+          <div class="ext-icon">🔮</div>
+          <div class="ext-name" data-i18n="ext.next.name"></div>
+          <p class="ext-desc" data-i18n="ext.next.desc"></p>
+          <span class="ext-status status-soon" data-i18n="ext.next.status"></span>
+        </div>
+        <div class="ext-card" style="opacity:.3;border-style:dashed;">
+          <div class="ext-icon">🛸</div>
+          <div class="ext-name" data-i18n="ext.future.name"></div>
+          <p class="ext-desc" data-i18n="ext.future.desc"></p>
+          <span class="ext-status status-soon" data-i18n="ext.future.status"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div id="about">
+      <div class="about-visual">
+        <div class="about-ring"></div>
+        <div class="about-ring"></div>
+        <div class="about-hex">🧩</div>
+      </div>
+      <div class="about-text">
+        <div class="section-label" data-i18n="about.label"></div>
+        <h2 data-i18n="about.title"></h2>
+        <div class="section-divider"></div>
+        <p data-i18n="about.p1"></p>
+        <p data-i18n="about.p2"></p>
+        <div class="about-tags">
+          <span class="tag">Chrome Extensions</span>
+          <span class="tag">Manifest V3</span>
+          <span class="tag">JavaScript</span>
+          <span class="tag">Side Panel API</span>
+          <span class="tag">Open Source</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p data-i18n="footer.copy"></p>
+  </footer>
+
+  <script>
+    const i18n = {
+      pt: {
+        "nav.extensions": "Extensões",
+        "nav.about": "Sobre",
+        "hero.badge": "Chrome Extensions",
+        "hero.sub": "Acesse ChatGPT, Claude, Gemini e outras IAs em um painel lateral sem sair da sua página atual.",
+        "hero.cta1": "Ver Extensões",
+        "hero.cta2": "Sobre o Projeto",
+        "ext.label": "// extensões",
+        "ext.title": "Nossas Ferramentas",
+        "ext.tagline": "Acesse ChatGPT, Claude, Gemini e outras IAs em um painel lateral sem sair da sua página atual.",
+        "ext.status": "Em breve",
+        "ext.next.name": "Próxima Extensão",
+        "ext.next.desc": "Nova ferramenta em desenvolvimento. Fique de olho nas novidades do Super Hub.",
+        "ext.next.status": "Em desenvolvimento",
+        "ext.future.name": "Futuro Projeto",
+        "ext.future.desc": "O ecossistema está crescendo. Mais extensões serão anunciadas em breve.",
+        "ext.future.status": "Planejado",
+        "about.label": "// sobre",
+        "about.title": "O Projeto",
+        "about.p1": "Super Hub nasceu da necessidade de consultar IAs sem perder o contexto da navegação. Em vez de abrir novas abas e interromper o raciocínio, um painel lateral mantém tudo visível ao mesmo tempo.",
+        "about.p2": "O objetivo é construir um ecossistema de extensões para o Chrome que se complementam, tornando a navegação mais inteligente e eficiente — sem coletar nenhum dado do usuário.",
+        "footer.copy": "© 2025 <span>Super Hub</span> — Todos os direitos reservados · SuperHub-SyS",
+        "ias.label": "IAs incluídas:",
+        "features": [
+          { icon:"📌", title:"Painel lateral fixo",       desc:"Navegue e consulte IAs ao mesmo tempo" },
+          { icon:"🤖", title:"IAs pré-configuradas",      desc:"ChatGPT, Claude, Gemini, Perplexity e Grok" },
+          { icon:"✏️", title:"Totalmente personalizável", desc:"Adicione, edite e remova IAs com URL personalizada" },
+          { icon:"↕️", title:"Drag-and-drop",             desc:"Reordene os cards como quiser" },
+          { icon:"🔍", title:"Busca em tempo real",       desc:"Encontre rapidamente qualquer IA cadastrada" },
+          { icon:"🌗", title:"Tema claro e escuro",       desc:"Interface adaptável à sua preferência" },
+          { icon:"🔡", title:"Ajuste de fonte",           desc:"Controle o tamanho do texto" },
+          { icon:"💾", title:"Exportar / Importar",       desc:"Faça backup da sua lista de IAs" },
+          { icon:"🔒", title:"Sem coleta de dados",       desc:"Tudo fica armazenado localmente no seu navegador" }
+        ]
+      },
+      en: {
+        "nav.extensions": "Extensions",
+        "nav.about": "About",
+        "hero.badge": "Chrome Extensions",
+        "hero.sub": "Access ChatGPT, Claude, Gemini and other AIs in a side panel without leaving your current page.",
+        "hero.cta1": "See Extensions",
+        "hero.cta2": "About the Project",
+        "ext.label": "// extensions",
+        "ext.title": "Our Tools",
+        "ext.tagline": "Access ChatGPT, Claude, Gemini and other AIs in a side panel without leaving your current page.",
+        "ext.status": "Coming soon",
+        "ext.next.name": "Next Extension",
+        "ext.next.desc": "New tool in development. Keep an eye on Super Hub updates.",
+        "ext.next.status": "In development",
+        "ext.future.name": "Future Project",
+        "ext.future.desc": "The ecosystem is growing. More extensions will be announced soon.",
+        "ext.future.status": "Planned",
+        "about.label": "// about",
+        "about.title": "The Project",
+        "about.p1": "Super Hub was born from the need to consult AIs without losing browsing context. Instead of opening new tabs and breaking your flow, a side panel keeps everything visible at once.",
+        "about.p2": "The goal is to build an ecosystem of complementary Chrome extensions, making browsing smarter and more efficient — without collecting any user data.",
+        "footer.copy": "© 2025 <span>Super Hub</span> — All rights reserved · SuperHub-SyS",
+        "ias.label": "Included AIs:",
+        "features": [
+          { icon:"📌", title:"Fixed side panel",       desc:"Browse and consult AIs at the same time" },
+          { icon:"🤖", title:"Pre-configured AIs",     desc:"ChatGPT, Claude, Gemini, Perplexity and Grok" },
+          { icon:"✏️", title:"Fully customizable",     desc:"Add, edit and remove AIs with custom URLs" },
+          { icon:"↕️", title:"Drag-and-drop",          desc:"Reorder cards however you like" },
+          { icon:"🔍", title:"Real-time search",       desc:"Quickly find any registered AI" },
+          { icon:"🌗", title:"Light & dark theme",     desc:"Interface adapts to your preference" },
+          { icon:"🔡", title:"Font size control",      desc:"Adjust text size to your liking" },
+          { icon:"💾", title:"Export / Import",        desc:"Backup your AI list" },
+          { icon:"🔒", title:"No data collection",     desc:"Everything is stored locally in your browser" }
+        ]
+      }
+    };
+
+    const IAS = ["ChatGPT", "Claude", "Gemini", "Perplexity", "Grok"];
+
+    const browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    const defaultLang  = browserLang.startsWith('pt') ? 'pt' : 'en';
+    let currentLang    = localStorage.getItem('lang') || defaultLang;
+
+    function applyTranslations(lang) {
+      const t = i18n[lang];
+      document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) el.innerHTML = t[key];
+      });
+
+      document.getElementById('featuresGrid').innerHTML = t.features.map(f => `
+        <div class="feature-item">
+          <span class="feature-icon">${f.icon}</span>
+          <div class="feature-text"><strong>${f.title}</strong>${f.desc}</div>
+        </div>`).join('');
+
+      document.getElementById('iasRow').innerHTML =
+        `<span style="font-size:.75rem;color:var(--muted);font-weight:600;letter-spacing:.1em;text-transform:uppercase;">${t['ias.label']}</span>` +
+        IAS.map(ia => `<span class="ia-badge">${ia}</span>`).join('');
+
+      document.getElementById('langToggle').textContent = lang === 'pt' ? 'EN' : 'PT';
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+    }
+
+    // Theme
+    const html  = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if (saved) html.setAttribute('data-theme', saved);
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+
+    document.getElementById('langToggle').addEventListener('click', () => {
+      applyTranslations(currentLang === 'pt' ? 'en' : 'pt');
+    });
+
+    applyTranslations(currentLang);
+  </script>
+</body>
+</html>
