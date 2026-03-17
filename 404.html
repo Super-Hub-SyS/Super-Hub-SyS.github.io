@@ -86,9 +86,17 @@
       transition: all var(--transition);
     }
     .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .theme-icon {
+      font-size: 1rem; line-height: 1;
+      transition: transform var(--transition);
+      cursor: default; user-select: none;
+    }
+    .theme-icon:hover { transform: scale(1.2); }
     .toggle-btn {
+      width: 42px; height: 22px;
       background: var(--border); border: 1px solid var(--accent);
       border-radius: 99px; cursor: pointer; position: relative;
+      flex-shrink: 0;
       transition: background var(--transition);
     }
     .toggle-btn::after {
@@ -260,6 +268,13 @@
     .home-btn:hover::after{opacity:.15}
     .home-btn:hover{box-shadow:var(--glow),0 8px 32px rgba(0,200,255,.3);transform:translateY(-2px)}
 
+    .theme-icon {
+      font-size: 1rem; line-height: 1;
+      transition: transform var(--transition);
+      cursor: default; user-select: none;
+    }
+    .theme-icon:hover { transform: scale(1.2); }
+
     @keyframes fadeUp {
       from{opacity:0;transform:translateY(18px)}
       to  {opacity:1;transform:translateY(0)}
@@ -274,6 +289,7 @@
     <a href="index.html" class="nav-logo">SUPER<span>HUB</span></a>
     <div style="display:flex;align-items:center;gap:1rem;">
       <button class="lang-btn" id="langToggle">EN</button>
+      <span class="theme-icon" id="themeIcon">🌙</span>
       <button class="toggle-btn" id="themeToggle" aria-label="Toggle theme"></button>
     </div>
   </nav>
@@ -419,10 +435,18 @@
     const html = document.documentElement;
     const saved = localStorage.getItem('theme');
     if (saved) html.setAttribute('data-theme', saved);
+
+    function updateThemeIcon() {
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀️';
+    }
+    updateThemeIcon();
+
     document.getElementById('themeToggle').addEventListener('click', () => {
       const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
       localStorage.setItem('theme', next);
+      updateThemeIcon();
     });
   </script>
 </body>

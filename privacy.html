@@ -73,6 +73,12 @@
       color: var(--muted); transition: color var(--transition); text-decoration: none;
     }
     .nav-back:hover { color: var(--accent); text-decoration: none; }
+    .theme-icon {
+      font-size: 1rem; line-height: 1;
+      transition: transform var(--transition);
+      cursor: default; user-select: none;
+    }
+    .theme-icon:hover { transform: scale(1.2); }
     .lang-btn {
       font-family: 'Orbitron', monospace;
       font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
@@ -165,6 +171,7 @@
     <div class="nav-right">
       <a href="index.html" class="nav-back" data-i18n="nav.back"></a>
       <button class="lang-btn" id="langToggle">EN</button>
+      <span class="theme-icon" id="themeIcon">🌙</span>
       <button class="toggle-btn" id="themeToggle" aria-label="Toggle theme"></button>
     </div>
   </nav>
@@ -269,10 +276,17 @@
     const saved = localStorage.getItem('theme');
     if (saved) html.setAttribute('data-theme', saved);
 
+    function updateThemeIcon() {
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀️';
+    }
+    updateThemeIcon();
+
     document.getElementById('themeToggle').addEventListener('click', () => {
       const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
       localStorage.setItem('theme', next);
+      updateThemeIcon();
     });
 
     document.getElementById('langToggle').addEventListener('click', () => {
