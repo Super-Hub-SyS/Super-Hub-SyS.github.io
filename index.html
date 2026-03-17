@@ -334,6 +334,62 @@
     }
     .tag:hover { border-color: var(--accent); color: var(--accent); }
 
+    /* SCREENSHOTS */
+    #screenshots { max-width: 1100px; margin: 0 auto; }
+    .screenshots-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem;
+    }
+    .screenshot-item {
+      border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+      background: var(--card);
+    }
+    .screenshot-item:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: var(--glow); }
+    .screenshot-item img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
+
+    /* LIGHTBOX */
+    .lightbox {
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,0.92);
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 85vh; border-radius: 8px; border: 1px solid var(--border); }
+    .lightbox-close {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      font-size: 1.5rem; color: var(--muted); cursor: pointer;
+      background: var(--card); border: 1px solid var(--border);
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .lightbox-close:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* STATUS LIVE */
+    .status-live {
+      background: rgba(0,200,255,0.1); color: var(--accent);
+      border: 1px solid rgba(0,200,255,0.3);
+    }
+    .status-live::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; animation: pulse 1.5s infinite; }
+
+    /* INSTALL BTN */
+    .btn-install {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.9rem 2.2rem; border-radius: 4px;
+      background: var(--accent); color: #04070f;
+      border: none; cursor: pointer;
+      transition: all var(--transition); position: relative; overflow: hidden;
+      margin-top: 2rem;
+    }
+    .btn-install::after { content:''; position:absolute; inset:0; background:white; opacity:0; transition:opacity var(--transition); }
+    .btn-install:hover::after { opacity: 0.15; }
+    .btn-install:hover { box-shadow: var(--glow), 0 8px 32px rgba(0,200,255,0.3); transform: translateY(-2px); }
+
     /* FOOTER */
     footer {
       position: relative; z-index: 1;
@@ -358,6 +414,7 @@
     <div class="nav-logo">SUPER<span>HUB</span></div>
     <ul>
       <li><a href="#extensions" data-i18n="nav.extensions"></a></li>
+      <li><a href="#screenshots" data-i18n="nav.screenshots"></a></li>
       <li><a href="#about" data-i18n="nav.about"></a></li>
       <li><a href="privacy.html" data-i18n="nav.privacy"></a></li>
     </ul>
@@ -374,7 +431,7 @@
     <h1><span class="accent">SUPER</span><br><span class="accent2">HUB</span></h1>
     <p class="hero-sub" data-i18n="hero.sub"></p>
     <div class="hero-cta">
-      <a href="#extensions" class="btn btn-primary" data-i18n="hero.cta1"></a>
+      <a href="https://chromewebstore.google.com/detail/super-hub-side-panel/dagofhdjiijhpbfkegmpnieipkfhkboo" target="_blank" class="btn btn-primary" data-i18n="hero.cta.install"></a>
       <a href="#about" class="btn btn-ghost" data-i18n="hero.cta2"></a>
     </div>
   </section>
@@ -392,10 +449,11 @@
             <div class="ext-name-lg">Super Hub</div>
             <p class="ext-tagline" data-i18n="ext.tagline"></p>
           </div>
-          <span class="ext-status status-soon" data-i18n="ext.status"></span>
+          <span class="ext-status status-live" data-i18n="ext.status"></span>
         </div>
         <div class="features-grid" id="featuresGrid"></div>
         <div class="ias-row" id="iasRow"></div>
+        <a href="https://chromewebstore.google.com/detail/super-hub-side-panel/dagofhdjiijhpbfkegmpnieipkfhkboo" target="_blank" class="btn-install" data-i18n="ext.install"></a>
       </div>
 
       <div class="ext-grid">
@@ -416,7 +474,20 @@
   </section>
 
   <section>
-    <div id="about">
+    <div id="screenshots">
+      <div class="section-label" data-i18n="ss.label"></div>
+      <h2 data-i18n="ss.title"></h2>
+      <div class="section-divider"></div>
+      <div class="screenshots-grid" id="screenshotsGrid"></div>
+    </div>
+  </section>
+
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <div class="lightbox-close" onclick="closeLightbox()">✕</div>
+    <img id="lightboxImg" src="" alt="" />
+  </div>
+
+  <section>
       <div class="about-visual">
         <div class="about-ring"></div>
         <div class="about-ring"></div>
@@ -450,22 +521,26 @@
     const i18n = {
       pt: {
         "nav.extensions": "Extensões",
+        "nav.screenshots": "Screenshots",
         "nav.about": "Sobre",
         "nav.privacy": "Privacidade",
-        "hero.badge": "Chrome Extensions",
+        "hero.badge": "Disponível na Chrome Web Store",
         "hero.sub": "Acesse ChatGPT, Claude, Gemini e outras IAs em um painel lateral sem sair da sua página atual.",
-        "hero.cta1": "Ver Extensões",
+        "hero.cta.install": "⚡ Instalar Grátis",
         "hero.cta2": "Sobre o Projeto",
         "ext.label": "// extensões",
         "ext.title": "Nossas Ferramentas",
         "ext.tagline": "Acesse ChatGPT, Claude, Gemini e outras IAs em um painel lateral sem sair da sua página atual.",
-        "ext.status": "Em breve",
+        "ext.status": "Disponível",
+        "ext.install": "⚡ Instalar na Chrome Web Store",
         "ext.next.name": "Próxima Extensão",
         "ext.next.desc": "Nova ferramenta em desenvolvimento. Fique de olho nas novidades do Super Hub.",
         "ext.next.status": "Em desenvolvimento",
         "ext.future.name": "Futuro Projeto",
         "ext.future.desc": "O ecossistema está crescendo. Mais extensões serão anunciadas em breve.",
         "ext.future.status": "Planejado",
+        "ss.label": "// screenshots",
+        "ss.title": "Veja em Ação",
         "about.label": "// sobre",
         "about.title": "O Projeto",
         "about.p1": "Super Hub nasceu da necessidade de consultar IAs sem perder o contexto da navegação. Em vez de abrir novas abas e interromper o raciocínio, um painel lateral mantém tudo visível ao mesmo tempo.",
@@ -487,22 +562,26 @@
       },
       en: {
         "nav.extensions": "Extensions",
+        "nav.screenshots": "Screenshots",
         "nav.about": "About",
         "nav.privacy": "Privacy",
-        "hero.badge": "Chrome Extensions",
+        "hero.badge": "Available on Chrome Web Store",
         "hero.sub": "Access ChatGPT, Claude, Gemini and other AIs in a side panel without leaving your current page.",
-        "hero.cta1": "See Extensions",
+        "hero.cta.install": "⚡ Install Free",
         "hero.cta2": "About the Project",
         "ext.label": "// extensions",
         "ext.title": "Our Tools",
         "ext.tagline": "Access ChatGPT, Claude, Gemini and other AIs in a side panel without leaving your current page.",
-        "ext.status": "Coming soon",
+        "ext.status": "Available",
+        "ext.install": "⚡ Install on Chrome Web Store",
         "ext.next.name": "Next Extension",
         "ext.next.desc": "New tool in development. Keep an eye on Super Hub updates.",
         "ext.next.status": "In development",
         "ext.future.name": "Future Project",
         "ext.future.desc": "The ecosystem is growing. More extensions will be announced soon.",
         "ext.future.status": "Planned",
+        "ss.label": "// screenshots",
+        "ss.title": "See It in Action",
         "about.label": "// about",
         "about.title": "The Project",
         "about.p1": "Super Hub was born from the need to consult AIs without losing browsing context. Instead of opening new tabs and breaking your flow, a side panel keeps everything visible at once.",
@@ -549,6 +628,16 @@
         `<span style="font-size:.75rem;color:var(--muted);font-weight:600;letter-spacing:.1em;text-transform:uppercase;">${t['ias.label']}</span>` +
         IAS.map(ia => `<span class="ia-badge">${ia}</span>`).join('');
 
+      // Screenshots — pasta por idioma
+      const ssFolder = lang === 'pt' ? 'screenshots/pt-br' : 'screenshots/en';
+      const ssAlts = lang === 'pt'
+        ? ['Painel lateral com IAs', 'Configurações', 'ChatGPT no painel', 'Adicionar IA personalizada', 'Busca em tempo real']
+        : ['Side panel with AIs', 'Settings', 'ChatGPT in panel', 'Add custom AI', 'Real-time search'];
+      document.getElementById('screenshotsGrid').innerHTML = [1,2,3,4,5].map((n, i) => `
+        <div class="screenshot-item" onclick="openLightbox('${ssFolder}/${n}.png')">
+          <img src="${ssFolder}/${n}.png" alt="Super Hub - ${ssAlts[i]}" loading="lazy" />
+        </div>`).join('');
+
       document.getElementById('langToggle').textContent = lang === 'pt' ? 'EN' : 'PT';
       currentLang = lang;
       localStorage.setItem('lang', lang);
@@ -570,6 +659,15 @@
     });
 
     applyTranslations(currentLang);
+
+    function openLightbox(src) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightbox').classList.add('open');
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
   </script>
 </body>
 </html>
