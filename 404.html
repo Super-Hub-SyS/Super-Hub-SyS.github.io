@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Hub — 404</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #04070f;
+      --border:    rgba(0,200,255,0.15);
+      --accent:    #00c8ff;
+      --accent2:   #7b2fff;
+      --text:      #e8f4ff;
+      --muted:     #5a7a99;
+      --card:      rgba(8,14,28,0.85);
+      --glow:      0 0 24px rgba(0,200,255,0.35);
+      --transition: 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    [data-theme="light"] {
+      --bg:      #f0f6ff;
+      --border:  rgba(0,120,200,0.18);
+      --accent:  #006bcc;
+      --accent2: #6b00e0;
+      --text:    #0a1628;
+      --muted:   #5577aa;
+      --card:    rgba(255,255,255,0.9);
+      --glow:    0 0 24px rgba(0,107,204,0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* GRID BG */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    /* STARS */
+    .stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .star {
+      position: absolute; border-radius: 50%; background: white;
+      animation: twinkle var(--d) ease-in-out infinite alternate;
+    }
+    @keyframes twinkle { from{opacity:0.1} to{opacity:1} }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 5vw;
+      backdrop-filter: blur(16px);
+      background: rgba(4,7,15,0.6);
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    [data-theme="light"] nav { background: rgba(240,246,255,0.7); }
+    .nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900; font-size: 1.1rem; letter-spacing: 0.12em;
+      color: var(--accent); text-shadow: var(--glow); text-decoration: none;
+    }
+    .nav-logo span { color: var(--text); }
+    .lang-btn {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); padding: 0.3rem 0.7rem;
+      border-radius: 4px; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .toggle-btn {
+      background: var(--border); border: 1px solid var(--accent);
+      border-radius: 99px; cursor: pointer; position: relative;
+      transition: background var(--transition);
+    }
+    .toggle-btn::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent); box-shadow: var(--glow);
+      transition: transform var(--transition);
+    }
+    [data-theme="light"] .toggle-btn::after { transform: translateX(20px); }
+
+    .lang-btn {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); padding: 0.3rem 0.7rem;
+      border-radius: 4px; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* SCENE */
+    .scene {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      padding: 0 2rem;
+    }
+
+    /* SPACE CANVAS */
+    .space {
+      position: relative;
+      width: min(400px, 88vw);
+      height: min(300px, 52vw);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ORBIT */
+    .orbit {
+      position: absolute;
+      top: 2%; left: 50%; transform: translateX(-50%);
+      width: 86%; height: 56%;
+      border: 1px dashed rgba(0,200,255,0.2);
+      border-radius: 50%;
+      animation: orbit-pulse 4s ease-in-out infinite;
+    }
+    @keyframes orbit-pulse { 0%,100%{opacity:.25} 50%{opacity:.55} }
+    .satellite {
+      position: absolute; top: -12px; left: 0;
+      font-size: min(1.1rem, 3vw);
+      animation: orbit-move 9s linear infinite;
+      transform-origin: min(172px,37.6vw) min(85px,14.7vw);
+    }
+    @keyframes orbit-move { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+    /* MOON */
+    .moon {
+      position: absolute;
+      bottom: 0; left: 50%; transform: translateX(-50%);
+      width: min(320px, 72vw);
+      height: min(160px, 37vw);
+    }
+    .moon-body {
+      width: 100%; height: 100%;
+      background: radial-gradient(ellipse at 50% 0%, #b8c8e8 0%, #7a90b8 40%, #4a5878 100%);
+      border-radius: 50% 50% 0 0 / 80% 80% 0 0;
+      overflow: hidden;
+      box-shadow: 0 -6px 24px rgba(0,200,255,0.12), inset 0 -4px 16px rgba(0,0,0,0.35);
+    }
+    [data-theme="light"] .moon-body {
+      background: radial-gradient(ellipse at 50% 0%, #dde8f8 0%, #a8b8d8 40%, #7888a8 100%);
+    }
+    .crater {
+      position: absolute; border-radius: 50%;
+      background: rgba(0,0,0,0.18);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.25);
+    }
+    .c1{width:20px;height:9px;top:28%;left:16%}
+    .c2{width:13px;height:6px;top:48%;left:54%}
+    .c3{width:9px; height:4px;top:22%;left:70%}
+
+    /* LANDING PAD */
+    .pad {
+      position: absolute;
+      bottom: 96%; left: 50%; transform: translateX(-50%);
+      width: min(60px,13vw); height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 99px;
+      box-shadow: var(--glow);
+    }
+    .pad::before,.pad::after {
+      content: ''; position: absolute; bottom: 0;
+      width: 2px; height: 10px; background: var(--accent); border-radius: 2px;
+    }
+    .pad::before{left:7px} .pad::after{right:7px}
+
+    /* ROCKET WRAPPER */
+    .rocket-wrap {
+      position: absolute;
+      left: 50%; bottom: 47%;
+      transform: translateX(-50%);
+      animation: land 3.2s cubic-bezier(.4,0,.2,1) forwards,
+                 hover 2.2s ease-in-out 3.2s infinite alternate;
+    }
+    @keyframes land {
+      0%  { bottom:100%; opacity:0; transform:translateX(-50%) rotate(-10deg) scale(.65); }
+      25% { opacity:1;   transform:translateX(-50%) rotate(5deg)  scale(.82); }
+      65% { bottom:68%;  transform:translateX(-50%) rotate(-2deg) scale(.96); }
+      85% { bottom:50%;  transform:translateX(-50%) rotate(1deg)  scale(1);   }
+      100%{ bottom:47%;  transform:translateX(-50%) rotate(0deg)  scale(1);   }
+    }
+    @keyframes hover {
+      from{ transform:translateX(-50%) translateY(0px); }
+      to  { transform:translateX(-50%) translateY(-6px); }
+    }
+
+    /* ROCKET SVG */
+    .rocket { width: min(58px,12vw); display:block; filter:drop-shadow(0 0 10px var(--accent)); }
+
+    /* FLAME */
+    .exhaust {
+      position:absolute; bottom:-20px; left:50%; transform:translateX(-50%);
+      width:13px;
+      animation: ex-show 3.2s forwards, ex-hide .4s 3.2s forwards;
+    }
+    @keyframes ex-show { 0%,70%{opacity:1} 100%{opacity:.25} }
+    @keyframes ex-hide  { to{opacity:0} }
+    .flame-svg { width:100%; animation: flicker .12s infinite alternate; }
+    @keyframes flicker {
+      from{transform:scaleX(1)   scaleY(1)}
+      to  {transform:scaleX(.75) scaleY(1.25)}
+    }
+
+    /* DUST */
+    .dust {
+      position:absolute; bottom:51%; left:50%; transform:translateX(-50%);
+      width:min(110px,25vw); opacity:0;
+      animation: dust-in .35s 2.8s ease-out forwards, dust-pulse 2s 3.4s ease-in-out infinite;
+    }
+    @keyframes dust-in   { from{opacity:0;transform:translateX(-50%) scaleX(.2)} to{opacity:1;transform:translateX(-50%) scaleX(1)} }
+    @keyframes dust-pulse{ 0%,100%{opacity:.6;transform:translateX(-50%) scaleX(1)} 50%{opacity:1;transform:translateX(-50%) scaleX(1.12)} }
+
+    /* TEXT */
+    .code-label {
+      font-size:.7rem; font-weight:700; letter-spacing:.25em; text-transform:uppercase;
+      color:var(--accent); margin-bottom:.4rem;
+      animation:fadeUp .7s 3s both;
+    }
+    .big-404 {
+      font-family:'Orbitron',monospace;
+      font-size:clamp(3.5rem,15vw,8rem); font-weight:900; line-height:1;
+      color:var(--accent); text-shadow:var(--glow);
+      animation:fadeUp .7s 3.2s both;
+    }
+    .msg {
+      font-size:clamp(.85rem,2.2vw,1rem); color:var(--muted); line-height:1.75;
+      max-width:400px; margin:.7rem auto 1.5rem;
+      animation:fadeUp .7s 3.4s both;
+    }
+    .home-btn {
+      font-family:'Orbitron',monospace;
+      font-size:.72rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
+      padding:.85rem 2rem; border-radius:4px;
+      background:var(--accent); color:#04070f;
+      border:none; cursor:pointer; text-decoration:none; display:inline-block;
+      transition:all var(--transition); position:relative; overflow:hidden;
+      animation:fadeUp .7s 3.6s both;
+    }
+    .home-btn::after{content:'';position:absolute;inset:0;background:white;opacity:0;transition:opacity var(--transition)}
+    .home-btn:hover::after{opacity:.15}
+    .home-btn:hover{box-shadow:var(--glow),0 8px 32px rgba(0,200,255,.3);transform:translateY(-2px)}
+
+    @keyframes fadeUp {
+      from{opacity:0;transform:translateY(18px)}
+      to  {opacity:1;transform:translateY(0)}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stars" id="stars"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo">SUPER<span>HUB</span></a>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <button class="lang-btn" id="langToggle">EN</button>
+      <button class="toggle-btn" id="themeToggle" aria-label="Toggle theme"></button>
+    </div>
+  </nav>
+
+  <div class="scene">
+
+    <div class="space">
+
+      <!-- Orbit + satellite -->
+      <div class="orbit"><span class="satellite">🛰️</span></div>
+
+      <!-- Dust cloud on landing -->
+      <div class="dust">
+        <svg viewBox="0 0 110 18" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="55" cy="9" rx="50" ry="7" fill="rgba(0,200,255,0.10)"/>
+          <ellipse cx="55" cy="9" rx="30" ry="4" fill="rgba(0,200,255,0.17)"/>
+        </svg>
+      </div>
+
+      <!-- Rocket -->
+      <div class="rocket-wrap">
+        <svg class="rocket" viewBox="0 0 60 96" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gb" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="#1a2a4a"/>
+              <stop offset="50%"  stop-color="#2a3a6a"/>
+              <stop offset="100%" stop-color="#1a2a4a"/>
+            </linearGradient>
+            <linearGradient id="gn" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#00c8ff"/>
+              <stop offset="100%" stop-color="#7b2fff"/>
+            </linearGradient>
+            <radialGradient id="gw" cx="38%" cy="32%">
+              <stop offset="0%"   stop-color="#e8f8ff"/>
+              <stop offset="100%" stop-color="#006bcc"/>
+            </radialGradient>
+            <linearGradient id="gf" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%"   stop-color="#00c8ff"/>
+              <stop offset="100%" stop-color="#7b2fff"/>
+            </linearGradient>
+          </defs>
+          <!-- body -->
+          <path d="M30 4C18 4 13 19 13 38L13 66L30 70L47 66L47 38C47 19 42 4 30 4Z" fill="url(#gb)"/>
+          <!-- nose cone -->
+          <path d="M30 4C24 4 17 13 17 25L43 25C43 13 36 4 30 4Z" fill="url(#gn)"/>
+          <!-- window -->
+          <circle cx="30" cy="34" r="7" fill="url(#gw)"/>
+          <circle cx="30" cy="34" r="5" fill="rgba(0,200,255,0.25)"/>
+          <!-- fin L -->
+          <path d="M13 57L4 73L13 69Z" fill="url(#gf)"/>
+          <!-- fin R -->
+          <path d="M47 57L56 73L47 69Z" fill="url(#gf)"/>
+          <!-- stripe 1 -->
+          <rect x="17" y="46" width="26" height="3" rx="1.5" fill="rgba(0,200,255,0.4)"/>
+          <!-- stripe 2 -->
+          <rect x="17" y="54" width="26" height="3" rx="1.5" fill="rgba(123,47,255,0.4)"/>
+          <!-- nozzle -->
+          <rect x="24" y="66" width="12" height="6" rx="2" fill="#111828"/>
+        </svg>
+
+        <!-- Exhaust flame -->
+        <div class="exhaust">
+          <svg class="flame-svg" viewBox="0 0 13 26" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="fl" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stop-color="#00c8ff" stop-opacity="1"/>
+                <stop offset="55%"  stop-color="#7b2fff" stop-opacity=".8"/>
+                <stop offset="100%" stop-color="#ff6600" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M6.5 0C3 5 0 11 2 19C3.5 24 6.5 26 6.5 26C6.5 26 9.5 24 11 19C13 11 10 5 6.5 0Z" fill="url(#fl)"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Moon -->
+      <div class="moon">
+        <div class="moon-body">
+          <div class="crater c1"></div>
+          <div class="crater c2"></div>
+          <div class="crater c3"></div>
+        </div>
+        <div class="pad"></div>
+      </div>
+
+    </div><!-- /space -->
+
+    <!-- 404 text -->
+    <div class="code-label" id="label404"></div>
+    <div class="big-404">404</div>
+    <p class="msg" id="msg404"></p>
+    <a href="index.html" class="home-btn" id="btn404"></a>
+
+  </div>
+
+  <script>
+    /* Stars */
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 130; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      const sz = Math.random() * 2.4 + 0.4;
+      s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*3+1).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s;opacity:${Math.random()};`;
+      starsEl.appendChild(s);
+    }
+
+    /* i18n */
+    const texts = {
+      pt: {
+        label: "// erro",
+        msg:   "Parece que essa página foi para o espaço e não voltou. Mas não se preocupe — o foguete já pousou e estamos de volta à base.",
+        btn:   "← Voltar para o início",
+      },
+      en: {
+        label: "// error",
+        msg:   "Looks like this page flew off into space and never came back. Don't worry — the rocket has landed and we're back at base.",
+        btn:   "← Back to home",
+      }
+    };
+
+    const browserLang = (navigator.language || 'en').toLowerCase();
+    const defaultLang = browserLang.startsWith('pt') ? 'pt' : 'en';
+    let currentLang   = localStorage.getItem('lang') || defaultLang;
+
+    function applyLang(lang) {
+      const t = texts[lang];
+      document.getElementById('label404').textContent = t.label;
+      document.getElementById('msg404').textContent   = t.msg;
+      document.getElementById('btn404').textContent   = t.btn;
+      document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+      document.getElementById('langToggle').textContent = lang === 'pt' ? 'EN' : 'PT';
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+    }
+
+    document.getElementById('langToggle').addEventListener('click', () => {
+      applyLang(currentLang === 'pt' ? 'en' : 'pt');
+    });
+
+    applyLang(currentLang);
+
+    /* Theme */
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if (saved) html.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+  </script>
+</body>
+</html>
